@@ -9,7 +9,7 @@ use embassy_time::Timer;
 use embassy_usb::{
     class::cdc_acm::{CdcAcmClass, State},
     driver::EndpointError,
-    Builder,
+    Builder, UsbDevice,
 };
 #[cfg(not(feature = "defmt"))]
 use panic_halt as _;
@@ -23,6 +23,7 @@ use embassy_stm32::{
     gpio::{Level, Output, Speed},
     peripherals,
     time::Hertz,
+    usb::{Driver, Instance},
 };
 use embassy_stm32::{
     usb::{self},
@@ -106,6 +107,18 @@ async fn main(_spawner: Spawner) {
                 let data = &buf[..n];
                 info!("data: {:x}", data);
                 led.toggle();
+
+                let led_state = led.is_set_high();
+
+                let text = if led_state {
+                    "LED is ON\r\n"
+                } else {
+                    "LED is OFF\r\n"
+                };
+
+                if usb_write_text(&mut class, text).await.is_err() {
+                    break;
+                }
             }
             info!("Disconnected!");
         }
@@ -123,4 +136,24 @@ impl From<EndpointError> for Disconnected {
             EndpointError::Disabled => Disconnected {},
         }
     }
+}
+
+async fn usb_write_text<'d, T: Instance + 'd>(
+    class: &mut CdcAcmClass<'d, Driver<'d, T>>,
+    text: &str,
+) -> Result<(), Disconnected> {
+    let mut buf = [0; 64];
+    let mut i = 0;
+    for c in text.bytes() {
+        buf[i] = c;
+        i += 1;
+        if i >= buf.len() {
+            class.write_packet(&buf).await?;
+            i = 0;
+        }
+    }
+    if i > 0 {
+        class.write_packet(&buf[..i]).await?;
+    }
+    Ok(())
 }
