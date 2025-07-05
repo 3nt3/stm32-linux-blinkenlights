@@ -1,7 +1,0 @@
-/home/ente/src/3nt3/stm32-linux-blinkenlights/firmware/target/thumbv7m-none-eabi/debug/deps/libbare_metal-1fac64c2ccbde23c.rmeta: /home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bare-metal-0.2.5/src/lib.rs
-
-/home/ente/src/3nt3/stm32-linux-blinkenlights/firmware/target/thumbv7m-none-eabi/debug/deps/libbare_metal-1fac64c2ccbde23c.rlib: /home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bare-metal-0.2.5/src/lib.rs
-
-/home/ente/src/3nt3/stm32-linux-blinkenlights/firmware/target/thumbv7m-none-eabi/debug/deps/bare_metal-1fac64c2ccbde23c.d: /home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bare-metal-0.2.5/src/lib.rs
-
-/home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bare-metal-0.2.5/src/lib.rs:

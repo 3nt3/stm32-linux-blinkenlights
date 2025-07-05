@@ -1,1 +1,0 @@
-/home/ente/src/3nt3/stm32-linux-blinkenlights/firmware/target/thumbv7m-none-eabi/release/firmware: /home/ente/src/3nt3/stm32-linux-blinkenlights/firmware/build.rs /home/ente/src/3nt3/stm32-linux-blinkenlights/firmware/src/fmt.rs /home/ente/src/3nt3/stm32-linux-blinkenlights/firmware/src/main.rs

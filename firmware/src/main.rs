@@ -92,6 +92,8 @@ async fn main(_spawner: Spawner) {
 
     let mut usb = builder.build();
 
+    let mut led = Output::new(&mut p.PC13, Level::High, Speed::Low);
+
     let usb_fut = usb.run();
 
     let echo_fut = async {
@@ -103,7 +105,7 @@ async fn main(_spawner: Spawner) {
                 let n = class.read_packet(&mut buf).await.unwrap();
                 let data = &buf[..n];
                 info!("data: {:x}", data);
-                class.write_packet(data).await.unwrap();
+                led.toggle();
             }
             info!("Disconnected!");
         }
