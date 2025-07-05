@@ -1,0 +1,8 @@
+/home/ente/src/3nt3/stm32-linux-blinkenlights/firmware/target/thumbv7m-none-eabi/debug/deps/libsdio_host-5ba59802b0926a30.rmeta: /home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sdio-host-0.5.0/src/lib.rs /home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sdio-host-0.5.0/src/cmd.rs
+
+/home/ente/src/3nt3/stm32-linux-blinkenlights/firmware/target/thumbv7m-none-eabi/debug/deps/libsdio_host-5ba59802b0926a30.rlib: /home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sdio-host-0.5.0/src/lib.rs /home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sdio-host-0.5.0/src/cmd.rs
+
+/home/ente/src/3nt3/stm32-linux-blinkenlights/firmware/target/thumbv7m-none-eabi/debug/deps/sdio_host-5ba59802b0926a30.d: /home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sdio-host-0.5.0/src/lib.rs /home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sdio-host-0.5.0/src/cmd.rs
+
+/home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sdio-host-0.5.0/src/lib.rs:
+/home/ente/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sdio-host-0.5.0/src/cmd.rs:
