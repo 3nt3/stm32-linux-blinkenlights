@@ -17,9 +17,11 @@ embassy-stm32 = { version = "0.2.0", features = ["memory-x", "stm32f103c8", "tim
 embassy-sync = "0.7.0"
 embassy-time = { version = "0.4.0", features = ["tick-hz-32_768"] }
 embassy-usb = { version = "0.4.0", features = ["defmt"] }
+heapless = "0.8.0"
 panic-halt = "1.0.0"
 panic-probe = { version = "1.0.0", features = ["print-defmt"], optional = true }
 static_cell = "2.1.1"
+blinkenlights-protocol = { path = "../blinkenlights-protocol" }
 
 [[bin]]
 name = "firmware"

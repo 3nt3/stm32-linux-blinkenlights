@@ -1,12 +1,29 @@
-use cortex_m::asm::wfe;
-use embassy_stm32::usb::{Driver, Instance};
+use blinkenlights_protocol::Command;
+use defmt::{error, info};
+use embassy_stm32::{
+    gpio::Output,
+    usb::{Driver, Instance},
+};
 use embassy_usb::{class::cdc_acm::CdcAcmClass, driver::EndpointError};
 
-use defmt::{error, info};
+use crate::logic;
 
-use crate::protocol::Command;
+pub async fn usb_task<'d, T: Instance + 'd>(
+    class: &mut CdcAcmClass<'d, Driver<'d, T>>,
+    leds: &mut [Output<'_>],
+) -> ! {
+    loop {
+        class.wait_connection().await;
+        info!("USB connection established");
+        handle_connection(class, leds).await;
+        info!("USB connection lost");
+    }
+}
 
-pub async fn usb_task<'d, T: Instance + 'd>(class: &mut CdcAcmClass<'d, Driver<'d, T>>) -> ! {
+async fn handle_connection<'d, T: Instance + 'd>(
+    class: &mut CdcAcmClass<'d, Driver<'d, T>>,
+    leds: &mut [Output<'_>],
+) {
     let mut buf: [u8; 64] = [0; 64];
     loop {
         let n_res = class.read_packet(&mut buf).await;
@@ -36,6 +53,6 @@ pub async fn usb_task<'d, T: Instance + 'd>(class: &mut CdcAcmClass<'d, Driver<'
         info!("Received {} bytes from USB: {:?}", n, &buf[..n]);
 
         // Process the received data
-        handle_command(Command::from_bytes(&buf), led).await;
+        logic::handle_command(Command::from_bytes(&buf), leds).await;
     }
 }

@@ -1,7 +1,6 @@
+use blinkenlights_protocol::Command;
 use defmt::{error, info};
 use embassy_stm32::gpio::Output;
-
-use crate::protocol::Command;
 
 pub async fn handle_command(command: Command, leds: &mut [Output<'_>]) {
     match command {
@@ -10,21 +9,25 @@ pub async fn handle_command(command: Command, leds: &mut [Output<'_>]) {
             info!("Setting LED {} to {}", index, value);
             // Here you would add the logic to turn on the specific LED
             if (index as usize) < leds.len() {
-                leds[index as usize].set_high();
+                if value.into() {
+                    leds[index as usize].set_low();
+                } else {
+                    leds[index as usize].set_high();
+                }
             } else {
                 error!("LED index {} out of range", index);
             }
         }
         Command::SetAll(value) => {
-            if value {
-                info!("Turning all LEDs ON");
-                for led in leds.iter_mut() {
-                    led.set_high();
-                }
-            } else {
-                info!("Turning all LEDs OFF");
-                for led in leds.iter_mut() {
+            info!(
+                "Setting all LEDs to {}",
+                if value.into() { "off" } else { "on" }
+            );
+            for led in leds.iter_mut() {
+                if value.into() {
                     led.set_low();
+                } else {
+                    led.set_high();
                 }
             }
         }

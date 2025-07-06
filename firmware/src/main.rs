@@ -4,12 +4,20 @@
 mod fmt;
 
 use defmt::info;
+use embassy_executor::Spawner;
 use embassy_futures::join::join;
+use embassy_stm32::Config;
+use embassy_stm32::{
+    bind_interrupts,
+    gpio::{Level, Output, Speed},
+    peripherals,
+    time::Hertz,
+};
 use embassy_time::Timer;
 use embassy_usb::{
     class::cdc_acm::{CdcAcmClass, State},
     driver::EndpointError,
-    Builder, UsbDevice,
+    Builder,
 };
 #[cfg(not(feature = "defmt"))]
 use panic_halt as _;
@@ -17,22 +25,12 @@ use panic_probe as _;
 #[cfg(feature = "defmt")]
 use {defmt_rtt as _, panic_probe as _};
 
-use embassy_executor::Spawner;
-use embassy_stm32::{
-    bind_interrupts,
-    gpio::{Level, Output, Speed},
-    peripherals,
-    time::Hertz,
-    usb::{Driver, Instance},
-};
-use embassy_stm32::{
-    usb::{self},
-    Config,
-};
-
 bind_interrupts!(struct Irqs {
-    USB_LP_CAN1_RX0 => usb::InterruptHandler<peripherals::USB>;
+    USB_LP_CAN1_RX0 => embassy_stm32::usb::InterruptHandler<peripherals::USB>;
 });
+
+mod logic;
+mod usb;
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
@@ -68,7 +66,7 @@ async fn main(_spawner: Spawner) {
         Timer::after_millis(10).await;
     }
 
-    let usb_driver = usb::Driver::new(p.USB, Irqs, p.PA12, p.PA11);
+    let usb_driver = embassy_stm32::usb::Driver::new(p.USB, Irqs, p.PA12, p.PA11);
 
     let mut usb_config = embassy_usb::Config::new(0xffff, 0xffff);
     usb_config.manufacturer = Some("3nt3");
@@ -93,38 +91,13 @@ async fn main(_spawner: Spawner) {
 
     let mut usb = builder.build();
 
-    let mut led = Output::new(&mut p.PC13, Level::High, Speed::Low);
-
     let usb_fut = usb.run();
 
-    let echo_fut = async {
-        loop {
-            class.wait_connection().await;
-            info!("Connected!");
-            let mut buf = [0; 64];
-            loop {
-                let n = class.read_packet(&mut buf).await.unwrap();
-                let data = &buf[..n];
-                info!("data: {:x}", data);
-                led.toggle();
+    let mut leds = [Output::new(&mut p.PC13, Level::High, Speed::Low)];
 
-                let led_state = led.is_set_high();
+    let usb_logic_fut = usb::usb_task(&mut class, &mut leds);
 
-                let text = if led_state {
-                    "LED is ON\r\n"
-                } else {
-                    "LED is OFF\r\n"
-                };
-
-                if usb_write_text(&mut class, text).await.is_err() {
-                    break;
-                }
-            }
-            info!("Disconnected!");
-        }
-    };
-
-    join(usb_fut, echo_fut).await;
+    join(usb_fut, usb_logic_fut).await;
 }
 
 struct Disconnected {}
@@ -136,24 +109,4 @@ impl From<EndpointError> for Disconnected {
             EndpointError::Disabled => Disconnected {},
         }
     }
-}
-
-async fn usb_write_text<'d, T: Instance + 'd>(
-    class: &mut CdcAcmClass<'d, Driver<'d, T>>,
-    text: &str,
-) -> Result<(), Disconnected> {
-    let mut buf = [0; 64];
-    let mut i = 0;
-    for c in text.bytes() {
-        buf[i] = c;
-        i += 1;
-        if i >= buf.len() {
-            class.write_packet(&buf).await?;
-            i = 0;
-        }
-    }
-    if i > 0 {
-        class.write_packet(&buf[..i]).await?;
-    }
-    Ok(())
 }

@@ -1,7 +1,9 @@
 #![no_std]
 
 use core::convert::{From, Into};
+use defmt::Format;
 
+#[derive(Format, Copy, Clone)]
 pub enum Level {
     High,
     Low,
@@ -26,17 +28,20 @@ impl From<Level> for bool {
     }
 }
 
+#[derive(Format, Copy, Clone)]
 pub enum Command {
     SetLED(u8, Level),
     SetAll(Level),
     Unknown,
 }
 
+#[derive(Format, Copy, Clone)]
 pub enum Response {
     Ok,
     Error(ErrorCode, &'static str),
 }
 
+#[derive(Format, Copy, Clone)]
 pub enum ErrorCode {
     InvalidCommand,
     InvalidParameter,
