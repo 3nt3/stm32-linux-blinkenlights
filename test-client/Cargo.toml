@@ -1,0 +1,15 @@
+[package]
+name = "test-client"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.98"
+blinkenlights-protocol = { version = "0.1.0", path = "../blinkenlights-protocol" }
+eframe = "0.31.1"
+egui = "0.31.1"
+egui_extras = "0.31.1"
+env_logger = { version = "0.11.8", features = ["auto-color", "humantime"] }
+log = "0.4.27"
+rusb = "0.9.4"
+serialport = "4.7.2"
