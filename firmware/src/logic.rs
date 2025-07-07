@@ -10,9 +10,9 @@ pub async fn handle_command(command: Command, leds: &mut [Output<'_>]) {
             // Here you would add the logic to turn on the specific LED
             if (index as usize) < leds.len() {
                 if value.into() {
-                    leds[index as usize].set_low();
-                } else {
                     leds[index as usize].set_high();
+                } else {
+                    leds[index as usize].set_low();
                 }
             } else {
                 error!("LED index {} out of range", index);
@@ -25,9 +25,9 @@ pub async fn handle_command(command: Command, leds: &mut [Output<'_>]) {
             );
             for led in leds.iter_mut() {
                 if value.into() {
-                    led.set_low();
-                } else {
                     led.set_high();
+                } else {
+                    led.set_low();
                 }
             }
         }

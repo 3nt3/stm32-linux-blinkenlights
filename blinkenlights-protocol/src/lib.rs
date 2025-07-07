@@ -55,22 +55,27 @@ impl Command {
         }
 
         match bytes[0] {
-            0x01 => {
-                if bytes.len() == 2 {
-                    Command::SetLED(bytes[1], (bytes[1] != 0).into())
-                } else {
-                    Command::Unknown
-                }
-            }
-            0x02 => {
-                if bytes.len() == 2 {
-                    Command::SetAll((bytes[1] != 0).into())
-                } else {
-                    Command::Unknown
-                }
-            }
+            0x01 => Command::SetLED(bytes[1], (bytes[2] != 0).into()),
+            0x02 => Command::SetAll((bytes[1] != 0).into()),
             _ => Command::Unknown,
         }
+    }
+
+    pub fn to_bytes(&self) -> [u8; 64] {
+        let mut bytes = [0x00; 64];
+        match self {
+            Command::SetLED(led, level) => {
+                bytes[0] = 0x01; // Command ID for SetLED
+                bytes[1] = *led;
+                bytes[2] = if (*level).into() { 1 } else { 0 };
+            }
+            Command::SetAll(level) => {
+                bytes[0] = 0x02; // Command ID for SetAll
+                bytes[1] = if (*level).into() { 1 } else { 0 };
+            }
+            Command::Unknown => {}
+        }
+        bytes
     }
 }
 

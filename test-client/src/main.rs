@@ -26,14 +26,16 @@ fn main() -> eframe::Result {
 }
 
 struct MyApp {
-    level: Level,
+    levels: Vec<Level>,
+    n_leds: usize,
 }
 
 impl Default for MyApp {
     fn default() -> Self {
         Self {
             // TODO
-            level: Level::Low,
+            levels: vec![Level::Low; 9],
+            n_leds: 9,
         }
     }
 }
@@ -42,23 +44,36 @@ impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("STM32 Blinkenlights");
-            if ui.button("Toggle LEDs").clicked() {
-                let cmd = Command::SetAll(if self.level.into() {
-                    Level::Low
-                } else {
-                    Level::High
-                });
+            // if ui.button("Toggle LEDs").clicked() {
+            //     usb::handle_command(cmd).unwrap_or_else(|err| {
+            //         error!("Error handling command: {}", err);
+            //     });
+            // }
 
-                usb::handle_command(cmd).unwrap_or_else(|err| {
-                    error!("Error handling command: {}", err);
-                });
+            // display n leds next to each other as checkboxes
+            ui.horizontal(|ui| {
+                for i in 0..self.n_leds {
+                    if ui.checkbox(&mut self.levels[i].into(), "").changed() {
+                        let cmd = Command::SetLED(
+                            i as u8,
+                            if (Into::<bool>::into(self.levels[i])) == true {
+                                Level::Low
+                            } else {
+                                Level::High
+                            },
+                        );
+                        usb::handle_command(cmd).unwrap_or_else(|err| {
+                            error!("Error handling command: {}", err);
+                        });
 
-                self.level = if self.level.into() {
-                    Level::Low
-                } else {
-                    Level::High
-                };
-            }
+                        // Update the UI to reflect the changed
+                        self.levels[i] = match self.levels[i] {
+                            Level::Low => Level::High,
+                            Level::High => Level::Low,
+                        };
+                    }
+                }
+            });
         });
     }
 }
