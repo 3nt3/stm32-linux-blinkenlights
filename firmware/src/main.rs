@@ -6,6 +6,7 @@ mod fmt;
 use defmt::info;
 use embassy_executor::Spawner;
 use embassy_futures::join::join;
+use embassy_stm32::gpio::{OutputOpenDrain, OutputType};
 use embassy_stm32::Config;
 use embassy_stm32::{
     bind_interrupts,
@@ -94,17 +95,16 @@ async fn main(_spawner: Spawner) {
     let usb_fut = usb.run();
 
     let mut leds = [
-        Output::new(&mut p.PA0, Level::Low, Speed::Low),
-        Output::new(&mut p.PA1, Level::Low, Speed::Low),
-        Output::new(&mut p.PA2, Level::Low, Speed::Low),
-        Output::new(&mut p.PA3, Level::Low, Speed::Low),
-        Output::new(&mut p.PA4, Level::Low, Speed::Low),
-        Output::new(&mut p.PA5, Level::Low, Speed::Low),
-        Output::new(&mut p.PA6, Level::Low, Speed::Low),
-        Output::new(&mut p.PA7, Level::Low, Speed::Low),
-        Output::new(&mut p.PA8, Level::Low, Speed::Low),
-        Output::new(&mut p.PA9, Level::Low, Speed::Low),
-        Output::new(&mut p.PC13, Level::Low, Speed::Low),
+        OutputOpenDrain::new(&mut p.PA0, Level::Low, Speed::Low),
+        OutputOpenDrain::new(&mut p.PA1, Level::Low, Speed::Low),
+        OutputOpenDrain::new(&mut p.PA2, Level::Low, Speed::Low),
+        OutputOpenDrain::new(&mut p.PA3, Level::Low, Speed::Low),
+        OutputOpenDrain::new(&mut p.PA4, Level::Low, Speed::Low),
+        OutputOpenDrain::new(&mut p.PA5, Level::Low, Speed::Low),
+        OutputOpenDrain::new(&mut p.PA6, Level::Low, Speed::Low),
+        OutputOpenDrain::new(&mut p.PA7, Level::Low, Speed::Low),
+        OutputOpenDrain::new(&mut p.PA8, Level::Low, Speed::Low),
+        OutputOpenDrain::new(&mut p.PA9, Level::Low, Speed::Low),
     ];
 
     let usb_logic_fut = usb::usb_task(&mut class, &mut leds);

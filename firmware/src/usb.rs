@@ -1,7 +1,7 @@
 use blinkenlights_protocol::Command;
 use defmt::{error, info};
 use embassy_stm32::{
-    gpio::Output,
+    gpio::OutputOpenDrain,
     usb::{Driver, Instance},
 };
 use embassy_usb::{class::cdc_acm::CdcAcmClass, driver::EndpointError};
@@ -10,7 +10,7 @@ use crate::logic;
 
 pub async fn usb_task<'d, T: Instance + 'd>(
     class: &mut CdcAcmClass<'d, Driver<'d, T>>,
-    leds: &mut [Output<'_>],
+    leds: &mut [OutputOpenDrain<'_>],
 ) -> ! {
     loop {
         class.wait_connection().await;
@@ -22,7 +22,7 @@ pub async fn usb_task<'d, T: Instance + 'd>(
 
 async fn handle_connection<'d, T: Instance + 'd>(
     class: &mut CdcAcmClass<'d, Driver<'d, T>>,
-    leds: &mut [Output<'_>],
+    leds: &mut [OutputOpenDrain<'_>],
 ) {
     let mut buf: [u8; 64] = [0; 64];
     loop {
